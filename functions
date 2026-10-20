@@ -1,0 +1,136 @@
+function adaugare()
+{
+	while true
+		do
+		echo -e "\nAdauga informatii..."
+		read -p "Numele restaurantului: " nume
+		read -p "Adresa : " adresa
+		read -p "Specialitatea casei: " tip
+		read -p "Numar de telefon: " tel
+		read -p "Anul deschiderii: " an
+		echo -e "\nRezultat:\nNume:\t\t$nume\nAdresa:\t\t$adresa\nSpecialitatea:\t$tip\nTelefon:\t$tel\nAnul deschiderii:\t$an\n"
+		read -p "Sunt corecte datele? (d/n) " rasp
+		case "$rasp" in
+			[Dd])
+				echo "Adauga informatii..."
+				echo "$nume:$adresa:$tip:$tel:$an" >> restaurant
+				sort -u restaurant -o restaurant
+				echo "Continua? (d/n) "
+				read rasp2
+				if [ "$rasp2" = "D" -o "$rasp2" = "d" ]
+					then continue
+				else return
+				fi;;
+			*)	echo "Vrei sa incerci din nou? (d/n) "				
+				read rasp3
+				case "$rasp3" in
+				[Dd]) continue;;
+				[Nn]) return;;
+				*)  echo "Optiune invalida";;
+				esac;;
+		esac
+	done
+}
+
+function stergere()
+{
+	echo "Sterge informatia..."
+	echo -e "\nIntroduceti numele restaurantului de sters (sau ENTER ca sa iesiti):\c"
+	read nume
+	if [ "$nume" = "" ]
+		then continue
+	fi
+	if grep -q "^$nume:" restaurant
+		then
+			read -p "Sigur vrei sa stergi restaurantul $nume? (d/n)" rasp
+			case "$rasp" in
+				[Dd])	sed -i "/^$nume:/d" restaurant
+					echo "Restaurantul a fost sters";;
+				*)	echo "Stergere Anulata";;
+			esac
+	else
+		echo "Eroare: restaurantul nu a fost gasit in baza de date"
+	fi
+	read -p "Apasati ENTER pentru a continua..." key
+}
+
+function cautare()
+{
+	echo -e "\nIntroduceti numele restaurantului cautat:\c"
+	read nume
+	if grep -qi "^$nume:" restaurant
+		then
+			echo -e "Restaurant gasit\n"
+			echo "------------------------------------------------------------------"
+			(echo "NUME RESTAURANT:ADRESA:SPECIALITATE:TELEFON:AN DESCHIDERE"; grep -i "^$nume:" restaurant) | column -s ":" -t
+			echo "------------------------------------------------------------------"
+	else
+		echo "$nume nu a fost gasit in baza de date"
+	fi
+	read -p "Apasati ENTER pentru a continua..." key
+}
+
+function modificare()
+{
+	echo -e "\nIntroduceti numele restaurantului cautat: "
+	read nume
+	if grep -qi "^$nume:" restaurant
+		then
+			echo -e "Restaurantul $nume a fost gasit\n"
+			echo "Ce camp doriti sa modificati?"
+			select camp in Adresa Specialitate Telefon Iesire
+			do
+				case $camp in
+				Adresa)
+					read -p "Care este adresa veche? " veche
+					read -p "Introduceti adreasa noua: " noua
+					sed -i "/^$nume:/I s/$veche/$noua/" restaurant
+					echo "Adresa a fost modificata"
+					break;;
+				Specialitate)
+					read -p "Care este vechea specialitate? " veche
+					read -p "Care este noua specialitate? " noua
+					sed -i "/^$nume:/I s/$veche/$noua/" restaurant
+					echo "Specialitatea a fost modificata!"
+					break;;
+				Telefon)
+					read -p "Care este numarul de telefon vechi? " veche
+					read -p "Care este noul numar de telefon? " noua
+					sed -i "/^$nume:/I s/$veche/$noua/" restaurant
+					echo "Numarul de telefon a fost modificat!"
+					break;;
+				Iesire) echo "Anulare modificare..."
+					break;;
+				*)	echo "Optiune invalida! Alege un numar din lista"
+				esac
+			done
+	else
+		echo "Restaurantul $nume nu a fost gasit in baza de date"
+	fi
+	read -p "Apasati ENTER pentru a continua..." key
+}
+
+
+
+
+
+
+
+
+
+	
+	
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
